@@ -1,0 +1,8 @@
+.DS_Store
+app/test/
+build/
+node_modules/
+.sass-cache/
+bower_components/
+components/
+app/components/

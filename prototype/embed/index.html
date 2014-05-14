@@ -16,6 +16,9 @@ var Variant = Parse.Object.extend("Variant", {});
 var Campaign = Parse.Object.extend("Campaign", {});
 var CampaignList = Parse.Collection.extend({model: Campaign});
 
+
+var clickthruAction = null;
+
 function chooseVariantFromCampaign(campaign) {
 
 	var variants = campaign.get("variants");
@@ -43,6 +46,32 @@ function chooseVariantFromCampaign(campaign) {
 	variant.id = chosenVariant;
 
 	return variant.fetch();
+}
+
+function bindClickthruAction(campaign) {
+
+	console.log(campaign);
+
+	var configuration = campaign.get("clickthruAction");
+	var action = null;
+
+	if (configuration.url) {
+
+		// bing redirect to url
+		action = function() {
+			document.location.href = configuration.url;
+		};
+
+	} else if (configuration.message) {
+
+		// bind popup with message content
+		action = function() {
+			alert(configuration.message);
+		};
+
+	} 
+
+	return action;
 }
 
 function number_format(num) {
@@ -150,7 +179,7 @@ function number_format(num) {
 			event.preventDefault();
 			});
 			
-			
+		
 		$('a').on('click', function(event) {
 			var href = $(this).attr('href');
 			if (href.substr(0,1)=="#") { return false; }
@@ -158,13 +187,15 @@ function number_format(num) {
 
 		if (typeof variant !== "undefined") {
 			$('a.download').on('click', function(event) {
+				event.preventDefault();
 				var href = $(this).attr('href');
 				mixpanel.track('variant_clickthru', packageEventData(variant));
-				alert(href);	
+				//alert(href);	
+				clickthruAction();
 			});
 		}
 		
-			
+		/*
 		$(document).click(function(e) {
 			if ($(e.target).closest('a').length === 0) {
 				document.location.href = data.url2;
@@ -173,9 +204,9 @@ function number_format(num) {
 				//alert('ok');
 				}
 			});
-
+*/
 		}
-
+		
 
 var data = {
 
@@ -208,7 +239,7 @@ appstore: '\
 		<div class="inapp">--INAPP--</div>\
 		</td>\
 	</tr>\
-	<tr><td class="tdscore"><table cellpadding="0" cellspacing="0" width="100%"><tr><td>--SCORE-- (--SCORERS--)</td><td><a class="download" href="--URL--">--PRICE--</a></td></tr></table></td></tr>\
+	<tr><td class="tdscore"><table cellpadding="0" cellspacing="0" width="100%"><tr><td>--SCORE-- (--SCORERS--)</td><td><a class="download" href="#">--PRICE--</a></td></tr></table></td></tr>\
 	</table>\
 	<div id="nav"><a href="#top" class="selected">Details</a><a href="#reviews">Reviews</a><a href="#" onclick="return false;">Related</a></div>\
 </div>\
@@ -286,6 +317,7 @@ $(function() {
 
 					jQuery.extend(true, data, variant.attributes);
 					draw(variant);
+					clickthruAction = bindClickthruAction(campaign);
 
 					// track impression
 					mixpanel.track('variant_shown',packageEventData(variant));

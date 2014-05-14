@@ -13,6 +13,7 @@ https://developers.google.com/+/quickstart/php
 
 http://localhost/cosmos/abtester/embed/index.html?json=[URL-OF-JSON-FILE-WITH THE ABOVE CONTENT]
 
+http://localhost/cosmos-web-tools/prototype/embed/index.html?p=qihRGZ1HER&g=2lRZIGmXFk
 
 //sample template
 
