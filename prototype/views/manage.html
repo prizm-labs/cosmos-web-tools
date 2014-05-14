@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Manage Embed Codes - App Store / Play Store </title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet"  type="text/css" href="../styles/manage.css" />
+<link rel="stylesheet"  type="text/css" href="../colorbox/colorbox.css" /> 
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+<script type="text/javascript" src="../colorbox/jquery.colorbox-min.js"></script> 
+ <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script>
+	Parse.initialize("{{ PARSE_KEY }}", "{{ PARSE_SECRET }}");
+</script>
+<script type="text/javascript" src="../scripts/manage.js"></script>
+
+<style>
+	.variant-frequency, .variant-active {
+		display: none;
+	}
+</style>
+
+</head>
+<body>
+<div id="top"><a href="http://www.scopely.com/" target="_blank"><img src="../images/scopely-logo.png" alt="Scopely" title="Scopely" /></a></div>
+
+
+<div class="campaigns">
+	<h1>Campaigns</h1>
+	<button id="new-campaign">+ NEW CAMPAIGN</button>
+	<ul id="campaign-list">
+    Loading...
+  </ul>
+</div>
+
+
+<div class="variants">
+	<h1>Variants</h1>
+	<button id="new-variant">+ NEW VARIANT</button>
+	<ul id="variant-list">
+		Loading...
+    <!--<img src='images/spinner.gif' class='spinner' />-->
+  </ul>
+</div>
+
+
+<form>
+
+Alias:<br />
+<input type="text" name="alias" /><br />
+
+Game:<br />
+<input type="text" name="gameObjectId" disabled/><br />
+
+Frequency:<br />
+<input type="text" name="frequency" /><br />
+
+<input type="radio" name="template" value="appstore"><img id="applelogo" src="../images/apple_logo.png" alt="App Store" /> 
+<input type="radio" name="template" value="playstore"><img id="playlogo" src="../images/playstore_logo.png" alt="Play Store" /> <br /><br />
+
+<table class="main" cellpadding="0" cellspacing="0">
+<tr>
+ <td>
+
+	<div class="formbox">
+
+	Title:<br />
+	<input type="text" name="title" /><br />
+
+	Company:<br />
+	<input type="text" name="company" /><br />
+
+	Price (e.g. FREE, $4.99):<br />
+	<input type="text" name="price" /><br />
+
+	Pricing model (e.g. In-app purchases, Offers In-App Purchases):<br />
+	<input type="text" name="inapp" /><br />
+
+	Size (Google Play):<br />
+	<input type="text" name="size" /><br />
+	
+	Number of Downloads (Google Play):<br />
+	<input type="text" name="downloads" /><br />
+
+	Rating (Stars):<br />
+	<input type="text" name="score" /><br />
+
+	Number of people who rated:<br />
+	<input type="text" name="scorers" /><br />
+
+	Thumb URL:<br />
+	<input type="text" name="thumb" /><br />
+
+	Screenshot URL:<br />
+	<input type="text" name="screen" /><br />
+	
+	Description:<br />
+	<textarea name="description"></textarea><br />
+
+	"BUY" button redirect tracking URL:<br />
+	<input type="text" name="url" /><br />
+	
+	Rest of page redirect tracking URL:<br />
+	<input type="text" name="url2" /><br />
+	
+	</div>
+	
+	</td>
+	
+  <td>
+	
+	<iframe src="../embed/index.html"></iframe><br />
+	<input type="button" id="getcode" value="SAVE VARIANT" />
+		
+  </td>
+
+</tr>
+
+<tr>
+  <td>
+	<div class="formbox">
+	<input type="button" id="addreview" value="+ ADD REVIEW" />
+	</div>
+	
+	<div class="review formbox" style="display:none">
+	<img class="close" src="../images/close.png" />
+	<table cellpadding="0" cellspacing="0">
+		<tr><td>Name</td><td><input type="text" name="reviews[]['by']" /></td></tr>
+		<tr><td>Rating</td><td><input type="text" name="reviews[]['score']" /></td></tr>
+		<tr><td>Date</td><td><input type="text" name="reviews[]['date']" /></td></tr>
+		<tr><td>Summary</td><td><input type="text" name="reviews[]['summary']" /></td></tr>
+		<tr><td>Review</td><td><input type="text" name="reviews[]['review']" /></td></tr>
+	</table>
+	</div>
+
+	
+  </td>
+  <td id="reviews">
+  </td>
+  
+</tr>
+</table>
+</form>
+
+
+<div style="display: none">
+  <div id="embedcode">
+	Use the following code to show the template:<br />
+	<textarea></textarea><br /><br />
+	You can also save the following JSON data on a public server:<br />
+	<textarea></textarea><br /><br />
+	and call it using the following code:<br />
+	<textarea></textarea>
+  </div>
+</div>
+
+<script type="text/template" id="variant-template">
+  <li class="<%= active ? 'active' : '' %>">
+		<div class="view">
+		  <input class="toggle variant-active" type="checkbox" <%= active ? 'checked="checked"' : '' %>>
+		  <label class="template-type"><%= template=="appstore" ? "Apple" : "Google" %></label>
+		  Game ID:<input class="variant-gameObjectId" disabled value="<%= gameObjectId %>"/>
+		  Variant ID:<input class="variant-objectId" disabled value="<%= objectId %>"/>
+		  <br />
+		  <input class="variant-alias" value="<%= alias %>"/>
+		  <input class="variant-frequency" value="<%= frequency %>"/>
+		  <button class="variant-options">Save Options</button>
+		  <button class="variant-preview">View</button>
+
+		</div>
+  </li>
+</script>
+
+<script type="text/template" id="campaign-template">
+  <li>
+  	<div class="info">
+  		<label class="">Alias:</label><input class="campaign-alias" value="<%= alias %>"/>
+  	</div>
+  	<div class="controls">
+  		<button class="balance-frequencies">Balance</button>
+  		<button class="save-frequencies">Save Frequencies</button>
+  	</div>
+  	<ul class="campaign-variants">variants</ul>
+  </li>
+</script>
+
+</body>
+</html>

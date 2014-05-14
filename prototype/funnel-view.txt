@@ -1,0 +1,40 @@
+// a funnel
+
+https://mixpanel.com/report/86277/funnels/#view/521543/from_date:-30,to_date:0
+
+https://mixpanel.com/api/2.0/funnels/?funnel_id=521543&from_date=2014-03-12&to_date=2014-04-11&limit=200&interval=31&api_key=1cb03a0a58267d8bcffa3cd86349dea9&expire=1397258898&sig=26b61b8ce244520f4e7fcef76001d552
+
+{"meta": {"dates": ["2014-03-12"]}, "data": {"2014-03-12": {"steps": [{"count": 211101, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 20894, "step_conv_ratio": 0.09897631939213931, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.09897631939213931, "avg_time": 62, "event": "HELP_tutorial_finish"}], "analysis": {"completion": 20894, "starting_amount": 211101, "steps": 2, "worst": 1}}}}
+
+
+//filter by property options
+
+https://mixpanel.com/api/2.0/events/properties/toptypes?type=general&limit=255&event=%5B%22HELP_tut_newuser_start%22%2C+%22HELP_tutorial_finish%22%5D&api_key=1cb03a0a58267d8bcffa3cd86349dea9&expire=1397258899&sig=35a881a201df2a97c38e63cdab4cfb5
+
+{"utm_campaign": {"count": 5867, "type": "string"}, "$region": {"count": 624833, "type": "string"}, "$initial_referring_domain": {"count": 688468, "type": "string"}, "$initial_referrer": {"count": 688468, "type": "string"}, "utm_source": {"count": 5867, "type": "string"}, "$referring_domain": {"count": 688468, "type": "string"}, "$city": {"count": 621106, "type": "string"}, "$os": {"count": 688468, "type": "string"}, "utm_medium": {"count": 5867, "type": "string"}, "$browser": {"count": 688468, "type": "string"}, "$referrer": {"count": 688468, "type": "string"}, "mp_country_code": {"count": 686804, "type": "string"}}
+
+
+
+//filter by property value options
+
+https://mixpanel.com/api/2.0/events/properties/values/multi?events=%5B%22HELP_tut_newuser_start%22%2C+%22HELP_tutorial_finish%22%5D&name=%24browser&limit=255&api_key=1cb03a0a58267d8bcffa3cd86349dea9&expire=1397259160&sig=285a2fbb0e4eb8e1c9e385775f1763fc
+
+["Internet Explorer", "Chrome", "Android Mobile", "Firefox", "Safari", "Mozilla", "iOS Mobile", "Opera", "", "Opera Mini"]
+
+
+
+//filter by property "browser" equals value "Android Mobile" result
+
+https://mixpanel.com/api/2.0/funnels/?funnel_id=521543&from_date=2014-03-12&to_date=2014-04-11&limit=200&where=(properties%5B%22%24browser%22%5D+%3D%3D+%22Android+Mobile%22)&interval=31&api_key=1cb03a0a58267d8bcffa3cd86349dea9&expire=1397259255&sig=0e8bdc66d737e95be5eaaa66c490938d
+
+
+{"meta": {"dates": ["2014-03-12"]}, "data": {"2014-03-12": {"steps": [{"count": 60492, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 332, "step_conv_ratio": 0.00548832903524433, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.00548832903524433, "avg_time": 103, "event": "HELP_tutorial_finish"}], "analysis": {"completion": 332, "starting_amount": 60492, "steps": 2, "worst": 1}}}}
+
+
+
+//funnel overview result
+
+https://mixpanel.com/api/2.0/funnels/?funnel_id=521543&from_date=2014-03-12&to_date=2014-04-11&limit=200&on=properties%5B%22%24browser%22%5D&interval=31&api_key=1cb03a0a58267d8bcffa3cd86349dea9&expire=1397259092&sig=44f6812e08ef5eaea6f53c7491f07b94
+
+
+{"meta": {"property_values": ["Chrome", "Android Mobile", "Internet Explorer", "Firefox", "Mozilla", "Safari", "iOS Mobile", "Opera", "Opera Mini"]}, "data": {"2014-03-12": {"Android Mobile": [{"count": 60488, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 332, "step_conv_ratio": 0.005488691971961381, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.005488691971961381, "avg_time": 103, "event": "HELP_tutorial_finish"}], "Firefox": [{"count": 22362, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 3740, "step_conv_ratio": 0.1672480100169931, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.1672480100169931, "avg_time": 59, "event": "HELP_tutorial_finish"}], "$overall": [{"count": 211085, "step_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start", "overall_conv_ratio": 1}, {"count": 20891, "step_conv_ratio": 0.09896960939905725, "avg_time": null, "event": "HELP_tutorial_finish", "overall_conv_ratio": 0.09896960939905725}], "Chrome": [{"count": 67355, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 9264, "step_conv_ratio": 0.1375399005270581, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.1375399005270581, "avg_time": 56, "event": "HELP_tutorial_finish"}], "iOS Mobile": [{"count": 1445, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 144, "step_conv_ratio": 0.09965397923875433, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.09965397923875433, "avg_time": 87, "event": "HELP_tutorial_finish"}], "Mozilla": [{"count": 9852, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 1181, "step_conv_ratio": 0.11987413723101908, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.11987413723101908, "avg_time": 72, "event": "HELP_tutorial_finish"}], "Opera": [{"count": 74, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 8, "step_conv_ratio": 0.10810810810810811, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.10810810810810811, "avg_time": 59, "event": "HELP_tutorial_finish"}], "Safari": [{"count": 6378, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 852, "step_conv_ratio": 0.13358419567262464, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.13358419567262464, "avg_time": 65, "event": "HELP_tutorial_finish"}], "Internet Explorer": [{"count": 43124, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 5370, "step_conv_ratio": 0.12452462665800947, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.12452462665800947, "avg_time": 70, "event": "HELP_tutorial_finish"}], "Opera Mini": [{"count": 7, "step_conv_ratio": 1, "goal": "HELP_tut_newuser_start", "overall_conv_ratio": 1, "avg_time": null, "event": "HELP_tut_newuser_start"}, {"count": 0, "step_conv_ratio": 0.0, "goal": "HELP_tutorial_finish", "overall_conv_ratio": 0.0, "avg_time": null, "event": "HELP_tutorial_finish"}]}}}

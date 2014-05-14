@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" href="embed.css" type="text/css" />
+<script src="jquery-1.9.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+<script>
+Parse.initialize("CaW2RpEi1Y2MUnaXbTqJQuQ8oM8xURoVduHuHVzB", "2reYOcoxbcYxYggPuYqg7F9Gfw1X7WLPw7LeSvid");
+
+var Variant = Parse.Object.extend("Variant", {});
+
+var Campaign = Parse.Object.extend("Campaign", {});
+var CampaignList = Parse.Collection.extend({model: Campaign});
+
+function chooseVariantFromCampaign(campaign) {
+
+	var variants = campaign.get("variants");
+	var chance = Math.random();
+	var chosenVariant = null;
+
+	var lowerLimit = 0;
+	var upperLimit = 0;
+
+	console.log(chance);
+
+	_.each(variants,function(variant){
+
+		upperLimit += variant.frequency;
+
+		if (chance >= lowerLimit && chance < upperLimit) {
+			chosenVariant = variant.id;
+			console.log('variant chosen '+chosenVariant);
+		}
+
+		lowerLimit = upperLimit;
+	});
+
+	var variant = new Variant();
+	variant.id = chosenVariant;
+
+	return variant.fetch();
+}
+
+function number_format(num) {
+		return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		}
+		
+	function get_star_line(score) {
+		var scoreline = '';
+		if (score > 5) { score = 5; }
+		if (score < 1) { score = 1; }
+		for (var j = 0; j < Math.floor(score); j++) { scoreline += '<img class="star" src="images/apple_star_full.png" />'; }
+		for (; j < Math.ceil(score); j++) { scoreline += '<img class="star" src="images/apple_star_half.png" />'; }
+		for (; j < 5; j++) { scoreline += '<img class="star" src="images/apple_star_blank.png" />'; }
+
+		if (data.template == 'playstore') { scoreline = scoreline.replace(/apple/g, 'google'); }
+		
+		return scoreline;
+		}
+		
+	function getUrlVars() {
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+		function(m,key,value) { vars[key] = value; });
+		return vars;
+		}
+		
+	function createReviews() {
+		var reviews = '';
+		for (i in data.reviews) {
+			if (data.reviews[i].score > 5) { data.reviews[i].score = 5; }
+			if (data.reviews[i].score < 1) { data.reviews[i].score = 1; }
+			if (data.template=='playstore') {
+				reviews += '<li><h3>' + data.reviews[i].by + '</h3>' +
+							'<div class="uscore">' + get_star_line(data.reviews[i].score) + '&nbsp; ' + data.reviews[i].date + '</div>' +
+							'<b>' + data.reviews[i].summary + '</b> ' + data.reviews[i].review + '</li>'
+				} else {
+				reviews += '<li><h3>' + data.reviews[i].summary + '</h3>' +
+							get_star_line(data.reviews[i].score) + '<span class="by"> by ' + data.reviews[i].by + ' - ' + data.reviews[i].date + '</span><br />' +
+							data.reviews[i].review + '</li>'
+				}
+			}
+		return reviews;
+		}
+
+	function formatScreenshotUrl(file) {
+		var assetsPath = 'screenshots/';
+		return formatImageUrl(assetsPath+file);
+	}
+	function formatIconUrl(file) {
+		var assetsPath = 'icons/';
+		return formatImageUrl(assetsPath+file);
+	}
+	function formatImageUrl(file){
+		var assetsPath = '../assets/';
+		return assetsPath+file;
+	}
+
+	function packageEventData(variant) {
+		data = variant.attributes;
+		data["id"] = variant.id;
+
+		return data;
+	}
+
+	function draw(variant) {
+	
+		if (data.template=='playstore') {
+			//data.price = data.price.replace('FREE', 'INSTALL');
+			if (data.inapp.length>0) { data.inapp += '<br />'; }
+			}
+			
+		if (typeof(templates[data.template]) == 'undefined') { return false; }
+
+		var content = templates[data.template];
+		content = content.replace(/--URL--/g, data.url);
+		content = content.replace(/--URL2--/g, data.url2);
+		content = content.replace(/--TITLE--/g, data.title);
+		content = content.replace(/--DESCRIPTION--/g, data.description.replace(/\n/g, '<br />'));
+		content = content.replace(/--COMPANY--/g, data.company);
+		content = content.replace(/--INAPP--/g, data.inapp);
+		content = content.replace(/--SIZE--/g, data.size);
+		content = content.replace(/--PRICE--/g, data.price);
+		content = content.replace(/--THUMB--/g, formatIconUrl(data.thumb));
+		content = content.replace(/--SCREEN--/g, formatScreenshotUrl(data.screen));
+		content = content.replace(/--SCORE--/g, get_star_line(data.score));
+		content = content.replace(/--SCORERS--/g, number_format(data.scorers));
+		content = content.replace(/--DOWNLOADS--/g, number_format(data.downloads));
+		content = content.replace(/--REVIEWS--/g, createReviews());
+
+		if (data.price!='FREE' || data.inapp.length>1) { 
+			content = content.replace('class="download"', 'class="download plus"');
+			}
+
+		$('body').addClass(data.template).html(content);
+		
+		$('div#nav a').on('click', function(event) {
+			if ($(this).index()<2) {
+				var href = $(this).attr('href');
+				if (href.substr(0,1)=="#" && href.length>1) {
+					var aTag = $("a[name='"+ href.substr(1) +"']");
+					$('html,body').animate({scrollTop: aTag.offset().top},'slow');
+					$(this).addClass('selected').siblings().removeClass('selected');
+					}
+				}
+			event.preventDefault();
+			});
+			
+			
+		$('a').on('click', function(event) {
+			var href = $(this).attr('href');
+			if (href.substr(0,1)=="#") { return false; }
+			});
+
+		if (typeof variant !== "undefined") {
+			$('a.download').on('click', function(event) {
+				var href = $(this).attr('href');
+				mixpanel.track('variant_clickthru', packageEventData(variant));
+				alert(href);	
+			});
+		}
+		
+			
+		$(document).click(function(e) {
+			if ($(e.target).closest('a').length === 0) {
+				document.location.href = data.url2;
+				//alert('cancel');
+				} else {
+				//alert('ok');
+				}
+			});
+
+		}
+
+
+var data = {
+
+	template: 'appstore',
+	title: 'Game Title',
+	url: 'http://www.google.com/',
+	url2: 'http://www.google.com/',
+	company: 'Game Company',
+	inapp: '',
+	price: 'FREE',
+	score: 5,
+	scorers: 10,
+	downloads: 1000,
+	size: '',
+	thumb: 'images/default-icon.png',
+	screen: 'images/default-screenshot.jpg',
+	description: 'Sample description',
+	reviews: []
+}
+
+var templates = {
+appstore: '\
+<a name="top"></a>\
+<div id="appstore">\
+<div id="top">\
+	<table id="main" cellpadding="0" cellspacing="0">\
+	<tr><td rowspan="2" class="tdimg"><img src="--THUMB--" /></td>\
+		<td><h1>--TITLE--</h1>\
+		<div class="company">--COMPANY--</div>\
+		<div class="inapp">--INAPP--</div>\
+		</td>\
+	</tr>\
+	<tr><td class="tdscore"><table cellpadding="0" cellspacing="0" width="100%"><tr><td>--SCORE-- (--SCORERS--)</td><td><a class="download" href="--URL--">--PRICE--</a></td></tr></table></td></tr>\
+	</table>\
+	<div id="nav"><a href="#top" class="selected">Details</a><a href="#reviews">Reviews</a><a href="#" onclick="return false;">Related</a></div>\
+</div>\
+<div id="bottom">\
+	<a href="--URL2--"><img src="--SCREEN--" id="screenshot" /></a>\
+	<div id="description"><h2>Description</h2>--DESCRIPTION--</div>\
+	<a name="reviews"></a>\
+	<h2>Customer Reviews</h2>\
+	<ul id="reviews">--REVIEWS--</ul>\
+</div>\
+</div>',
+
+playstore: '\
+<a name="top"></a>\
+<div id="playstore">\
+<div id="top">\
+	<table id="main" cellpadding="0" cellspacing="0">\
+	<tr><td rowspan="2" class="tdimg"><img src="--THUMB--" /></td>\
+		<td><h1>--TITLE--</h1>\
+		<div class="company">--COMPANY--</div>\
+		</td>\
+	</tr>\
+	<tr><td class="tdscore"><a class="download" href="--URL--">--PRICE--</a></td></tr>\
+	</table>\
+</div>\
+<div id="bottom">\
+	<a href="--URL2--"><img src="--SCREEN--" id="screenshot" /></a>\
+	<table id="gamedata" cellpadding="0" cellspacing="0">\
+	<tr><td>--SCORE-- &nbsp; --SCORERS--<br />--DOWNLOADS--+ downloads</td>\
+		<td>--INAPP----SIZE--</td></tr>\
+	</table>\
+	<div id="description"><h2>Description</h2>--DESCRIPTION--</div>\
+	<a name="reviews"></a>\
+	<h2 class="reviewtitle">Reviews</h2>\
+	<ul id="reviews">--REVIEWS--</ul>\
+</div>\
+</div>'};
+
+		
+$(function() {
+
+	var publisherId = getUrlVars()['p'];
+	var gameId = getUrlVars()['g'];
+
+	var userData = getUrlVars()['data'];															// Processing user data
+	var userJSON = getUrlVars()['json'];															// Processing user's JSON
+
+
+	if (typeof(publisherId) != 'undefined' && typeof(gameId) != 'undefined') {
+
+		//TODO detect OS
+
+		//http://localhost/cosmos/abtester/embed/index.html?p=qihRGZ1HER&g=2lRZIGmXFk
+		var q = {
+			os: "iOS",
+			publisher: publisherId,
+			game: gameId
+		};
+
+		var campaigns = new CampaignList();
+		campaigns.query = new Parse.Query(Campaign);
+		campaigns.query.equalTo("os",q.os);
+		campaigns.query.equalTo("gameObjectId",q.game);
+		campaigns.query.equalTo("publishers",q.publisher);
+		campaigns.query.equalTo("active",true);
+		campaigns.fetch({
+			success: function(results){
+				console.log(campaigns);
+				console.log(results);
+				var campaign = campaigns.models[0];
+				
+				chooseVariantFromCampaign(campaign).then(function(variant){
+					console.log('chosen variant data:');
+					console.log(variant);
+
+					jQuery.extend(true, data, variant.attributes);
+					draw(variant);
+
+					// track impression
+					mixpanel.track('variant_shown',packageEventData(variant));
+				});
+			}
+		});
+
+	} else if (typeof(userData) != 'undefined') {
+
+		userData = JSON.parse(decodeURIComponent(userData));
+		
+		jQuery.extend(true, data, userData);
+		draw();
+
+	} else {
+
+		$.getJSON(userJSON, function(userData) {
+		
+		jQuery.extend(true, data, userData);
+		draw();
+		});
+
+	}
+
+});
+</script>
+<!-- start Mixpanel --><script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f)}})(document,window.mixpanel||[]);
+mixpanel.init("35367ec347f3695d5d6e051463970219");</script><!-- end Mixpanel -->
+</head>
+<body></body>
+</html>
