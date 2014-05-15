@@ -278,6 +278,27 @@ playstore: '\
 </div>\
 </div>'};
 
+
+ // http://stackoverflow.com/questions/21741841/detecting-ios-android-operating-system
+function getMobileOperatingSystem() {
+  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+  if( userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i ) )
+  {
+    return 'iOS';
+
+  }
+  else if( userAgent.match( /Android/i ) )
+  {
+
+    return 'Android';
+  }
+  else
+  {
+    return null;
+  }
+}
+
 		
 $(function() {
 
@@ -290,18 +311,21 @@ $(function() {
 
 	if (typeof(publisherId) != 'undefined' && typeof(gameId) != 'undefined') {
 
-		//TODO detect OS
+		// detect OS
+		var os = getMobileOperatingSystem();
 
-		//http://localhost/cosmos/abtester/embed/index.html?p=qihRGZ1HER&g=2lRZIGmXFk
+		// http://localhost/cosmos/abtester/embed/index.html?p=qihRGZ1HER&g=2lRZIGmXFk
 		var q = {
-			os: "iOS",
+			os: os,
 			publisher: publisherId,
 			game: gameId
 		};
 
 		var campaigns = new CampaignList();
 		campaigns.query = new Parse.Query(Campaign);
-		campaigns.query.equalTo("os",q.os);
+		if (q.os!=null) {
+			campaigns.query.equalTo("os",q.os);
+		}
 		campaigns.query.equalTo("gameObjectId",q.game);
 		campaigns.query.equalTo("publishers",q.publisher);
 		campaigns.query.equalTo("active",true);
@@ -309,8 +333,11 @@ $(function() {
 			success: function(results){
 				console.log(campaigns);
 				console.log(results);
+
 				var campaign = campaigns.models[0];
-				
+
+				console.log(campaign);
+
 				chooseVariantFromCampaign(campaign).then(function(variant){
 					console.log('chosen variant data:');
 					console.log(variant);
